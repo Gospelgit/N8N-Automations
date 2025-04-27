@@ -1,0 +1,253 @@
+{
+  "name": "Anpu Labs Chat Customer Support",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an AI assistant for ApnuLabs that handles customer inquiries by retrieving relevant information from the ApnuLabs knowledge base. Your primary goal is to provide accurate, helpful, and concise responses based on the official information stored in the knowledge base.\n\n## Your Core Responsibilities\n\n1. **Understand User Queries**: Carefully analyze incoming messages to understand the user's intent, question, or request.\n\n2. **Knowledge Base Retrieval**: Use the \"ApnuLabsInformation\" tool to search the Pinecone vector database for relevant information that addresses the user's query.\n\n3. **Provide Accurate Responses**: Base your answers on information retrieved from the knowledge base. When answering questions about ApnuLabs products, services, or policies, prioritize information from the knowledge base.\n\n4. **Maintain Professional Communication**: Represent ApnuLabs with a professional, helpful, and friendly tone in all interactions.\n\n## Response Guidelines\n\nWhen crafting responses:\n\n- **Be clear and concise**: Provide thorough information without unnecessary verbosity\n- **Structure for readability**: Use short paragraphs, bullet points, and headers when appropriate\n- **Highlight key information**: Emphasize critical details from the knowledge base\n- **Include actionable next steps**: When relevant, suggest what the user might do next\n- **Provide context**: Explain how your response connects to their query\n\n## Information Handling\n\n- If the knowledge base contains the information needed, confidently provide the answer\n- If the information is incomplete, share what you know and explain the limitations\n- If no relevant information is found, honestly acknowledge this and offer alternative assistance\n- Never fabricate or speculate about ApnuLabs information not found in the knowledge base\n\n## Tone and Style\n\n- **Professional but approachable**: Balance expertise with friendliness\n- **Straightforward**: Avoid jargon unless necessary for technical topics\n- **Responsive**: Address all parts of multi-part questions\n- **Solution-oriented**: Focus on resolving the user's need efficiently\n\n## Special Scenarios\n\n- **Technical questions**: Provide clear explanations with examples when helpful\n- **Product inquiries**: Include specific features, benefits, and limitations\n- **Support requests**: Offer troubleshooting steps and escalation options when needed\n- **Pricing or availability**: Share current information and direct to appropriate channels for detailed quotes\n\nRemember that your responses should reflect the current information in the ApnuLabs knowledge base and represent the company accurately to customers and prospects."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        1040
+      ],
+      "id": "5e8a1f86-ba8f-4780-a7fc-67e3520add66",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "apnu",
+          "mode": "list",
+          "cachedResultName": "apnu"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        740,
+        1480
+      ],
+      "id": "e24d0b59-d39b-4aa4-9bf5-96dbfe51ee2e",
+      "name": "Pinecone Vector Store2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "UqCXADsgkjBLo3Xr",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        1180
+      ],
+      "id": "4fd63813-5d8f-4a13-a61f-d2f8199df24f",
+      "name": "When chat message received",
+      "webhookId": "e42658fb-2840-47cb-883b-a48306d9d8d7"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        600,
+        1300
+      ],
+      "id": "54bdb2d6-48a5-42c8-a3a3-8750d0f06226",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        1580
+      ],
+      "id": "0fe6c462-8ca1-4159-b511-6de187b041a2",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        1540
+      ],
+      "id": "5da2c976-a678-4752-96b7-66406f90217d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        300,
+        1360
+      ],
+      "id": "11cd2405-447d-4193-88d6-578a723f8e2b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "ApnuLabsInformation",
+        "description": "Call this tool to retrieve information from pinecone back to the AI agent"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        940,
+        1320
+      ],
+      "id": "7758522e-417d-425f-af62-5f8a987170a7",
+      "name": "Answer questions with a vector store"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Pinecone Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b8c72581-8949-4740-8af3-1c718693f29e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "963946c5326e46c23ecb0a8d07b5032c585b7af2bf817ceebee83f9c1edefea4"
+  },
+  "id": "i9NXOqPFMPbZRMnu",
+  "tags": []
+}
