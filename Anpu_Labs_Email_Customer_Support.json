@@ -1,0 +1,388 @@
+{
+  "name": "Anpu Labs Email Customer Support",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "\"Anpu\"",
+          "sender": "gospelbassey97@gmail.com"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        40
+      ],
+      "id": "582e09ac-1f02-4c18-83ed-a460f3b57ea6",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mxp9UCSE2n3mFWML",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.headers.subject }}\n\n{{ $json.text}}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Inquiry",
+              "description": "Asking questions or requesting information about our products or services"
+            },
+            {
+              "category": "Other",
+              "description": "Any other action"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "discard"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        40
+      ],
+      "id": "75f7bdcc-4102-4f3a-9114-3367a68db3ba",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "name": "AnpuLabsInformation",
+        "description": "Call this tool to retrieve information to create email responses"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        820,
+        100
+      ],
+      "id": "916964f2-ea45-4ebe-9c05-44530aa9c156",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "apnu",
+          "mode": "list",
+          "cachedResultName": "apnu"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        572,
+        282.5
+      ],
+      "id": "3fb9f83b-2cb0-4155-bdac-3e69633d08e5",
+      "name": "Pinecone Vector Store2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "UqCXADsgkjBLo3Xr",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{$node[\"Gmail Trigger\"].json[\"id\"]}}",
+        "emailType": "text",
+        "message": "={{$node[\"AI Agent\"].json[\"output\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        -120
+      ],
+      "id": "74583b12-0ac0-41a2-9b54-71db27ad0822",
+      "name": "Gmail",
+      "webhookId": "1fb2036a-70b2-41f9-af93-8973ace6fa5e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mxp9UCSE2n3mFWML",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Email subject: {{ $json.headers.subject }}\nEmail content:{{ $json.text }}\nEmail from: {{ $json.headers.from }}",
+        "options": {
+          "systemMessage": "=You are an AI agent designed to process incoming emails that have already been classified by a text classifier. For each email you receive:\n\nYou are an AI email assistant responsible for managing customer email inquiries. Your tasks are as follows:\n\nGenerate vector embeddings of the received email content to capture its semantic meaning.\n\nSearch the Pinecone vector database using these embeddings to find and retrieve the most relevant knowledge base articles or reference materials.\n\nAnalyze the retrieved information and use an advanced AI language model to draft a clear, accurate, and helpful response to the customer’s inquiry.\n\nSend the drafted response back to the customer using Gmail, ensuring the reply is sent to the original sender.\n\nYour goal is to provide fast, contextually relevant, and professional answers by leveraging both the knowledge base and AI-powered generation. Always ensure the information you provide is accurate and helpful, and maintain a courteous and professional tone in all communications.\n\nNote: the reply email should only contain the retrieved information only and nothing else. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        572,
+        -140
+      ],
+      "id": "db919c94-0518-4044-b2ad-a0d19614bfe9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        100
+      ],
+      "id": "1f0b64fd-001d-447a-b84f-a93fd6549721",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        360
+      ],
+      "id": "7f3e4f96-cb8a-4c87-9eae-a822937b4c42",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        480
+      ],
+      "id": "1904f34f-28ef-4090-b4e3-1b3ece99b995",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -140,
+        320
+      ],
+      "id": "b47410c3-713c-4ef3-b3d8-207ec92ab0f6",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "9lTDU4nVx8KZRVPg",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "dedicatedguy97@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        260
+      ],
+      "id": "640a318e-6924-4fbe-8072-ad7ad62b0c86",
+      "name": "Gmail1",
+      "webhookId": "ba6c8573-38e9-4d2c-9821-db407edc7169",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mxp9UCSE2n3mFWML",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4a07a550-6f85-4738-a3cf-10ebcd2e44a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "963946c5326e46c23ecb0a8d07b5032c585b7af2bf817ceebee83f9c1edefea4"
+  },
+  "id": "LMJ3shqtddlo5ycC",
+  "tags": []
+}
